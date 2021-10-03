@@ -1,12 +1,17 @@
+import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 
 import {urlAllProduct} from "../url.json"
-import {useEffect, useState} from "react";
+
+import Loading from "./Loading";
+
+
 
 export default function ProductPage (){
     const {productUrl} = useParams();
 
     const [products,setProducts] = useState([]);
+    const [loading,setLoading] = useState();
 
     useEffect(()=>{
         fetch(urlAllProduct)
@@ -14,6 +19,8 @@ export default function ProductPage (){
             .then(resp => setProducts(resp))
 
     },[])
+
+
 
 
     return (
@@ -28,9 +35,12 @@ export default function ProductPage (){
                                            <div className="row d-flex align-items-center" key={item.name + item.region + item.area}>
                                                <div className='col-6' key={item.name}>
                                                    <img src={item.flag} alt={item.name} style={{'width': '95%'}}/>
+                                                   {
+                                                       console.log(item.flag)
+                                                   }
                                                </div>
                                                <div className="col-6" key={item.name + 5}>
-                                                   <h2>Название: <b>{item.name}</b></h2>
+                                                   <h2 className='test'>Название: <b>{item.name}</b></h2>
                                                    <p>Столица: <b>{item.capital}</b></p>
                                                    <p>Регион: <b>{item.region}</b></p>
                                                    <p>Субрегион: <b>{item.subregion}</b></p>
@@ -40,11 +50,7 @@ export default function ProductPage (){
                                            <a href='/' className='btn btn-primary' style={{'margin': '10px 0 0 0'}}>Назад</a>
                                        </>
                                     )
-                                    : (
-                                        <>
-                                            <h2 key={item.name + item.region + item.area}></h2>
-                                        </>
-                                      )
+                                    : false
                                 }
                             </>
                         ))

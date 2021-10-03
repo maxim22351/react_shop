@@ -11,6 +11,7 @@ import {Context} from "../index";
 import ProductList from "./ProductList";
 import Basket from "./Basket";
 import Loading from "./Loading";
+import ModalAuth from "./ModalAuth";
 
 import {add,
     reset,
@@ -19,10 +20,11 @@ import {add,
     authDataSelect,
     statusModalSelect,
     statusModalCheck,
-    historySelect
+    historySelect,
+    resetCount
 } from '../store/ProductSlice'
 import {useAuthState} from "react-firebase-hooks/auth";
-
+import {useCollectionData} from "react-firebase-hooks/firestore";
 
 
 
@@ -30,16 +32,18 @@ import {useAuthState} from "react-firebase-hooks/auth";
 
 export default function Main (){
 
-    const {auth} = useContext(Context);
-    const [user,loading] = useAuthState(auth);
-
-
+    const {auth,firestore} = useContext(Context);
+    const [user] = useAuthState(auth);
+    const [shop] = useCollectionData(
+        firestore.collection('react_shop').orderBy('time')
+    )
 
     const refUl = React.createRef();
 
     const [products,setProducts] = useState([]);
     const [inputSearch, setInputSearch] = useState('');
     const [productReset, setProductReset] = useState([]);
+    const [loading,setLoading] = useState(true)
 
     const count = useSelector(countSelect);
     const authСondition = useSelector(authСonditionSelect);
@@ -66,7 +70,15 @@ export default function Main (){
                await setProductReset(resp.data)
                await dispatch(reset(resp.data))
             })
-    },[])
+
+        if (Object.keys(count).length > 0) localStorage.setItem('count',JSON.stringify(count));
+        else {
+             dispatch(resetCount(JSON.parse(localStorage.getItem('count'))))
+        }
+
+
+    },[count])
+
 
 
     // Filter
@@ -75,7 +87,6 @@ export default function Main (){
         let a = []
 
         for (const item in productsObj) a.push(productsObj[item]);
-
 
         if (event === 'cheap') setProducts(a);
         else if (event === 'dear') setProducts(a.reverse());
@@ -93,31 +104,20 @@ export default function Main (){
         let dataset = e.target.dataset;
         let event = e.target;
 
-        if (event.classList.contains('star') || event.classList.contains('btn')){
+        if (event.classList.contains('btn')){
             e.preventDefault();
-
             if (user !== null){
                 if (dataset.key !== undefined) {
-                    let a = [];
                     dispatch(add(dataset.key))
-
-                    for (const item in count) {
-                        a.push(item);
-                    }
-
                 };
             } else alert('Для покупки нужно авторизивуваться')
 
-            if(event.classList.contains('star')){
-                if (dataset.star === "false") { event.src = 'img/star_active.svg'; dataset.star = 'true';}
-                else { event.src = 'img/star.svg'; dataset.star = 'false';}
-            }
         }
 
     }
 
 
-    // Auth
+    // Auth firebase
     async function clickAuth (){
         const provider =  new firebase.auth.GoogleAuthProvider()
         const {user} =  await auth.signInWithPopup(provider)
@@ -125,85 +125,117 @@ export default function Main (){
     }
 
 
+    // Send firebase
+    async function sendData (){
+       await firestore.collection('react_shop').add({
+            uid: user.uid,
+            name: user.displayName,
+            count: JSON.parse(localStorage.getItem('count')),
+            email: user.email,
+            time: firebase.firestore.FieldValue.serverTimestamp()
+        })
+    }
+
+    //Loading
+    function Loadings (){
+        setTimeout(()=>{
+            setLoading(false)
+        },1000)
+    }
+
+    Loadings();
+
+
+    if (loading){
+        return <Loading/>
+    }
+
     return (
-        (loading)?(
-            <Loading/>
-        )
-        :
-        (
-            <>
-                <div className="container">
+        <>
+            <div className="container">
 
-                    <Basket/>
-                    <div className="row">
-                        <div className="col-2 offset-10 mt-2 d-flex flex-column">
-                            {
-                                (user !== null)?(
-                                        <>
-                                            <h4 className='auth_block'>{user.displayName}</h4>
-                                            <img src={user.photoURL} alt={user.displayName} className='auth_block'/>
-                                            <button
-                                                className='btn btn-danger mt-2 auth_block'
-                                                style={{'width': '50%'}}
-                                                onClick={()=> auth.signOut()}
-                                            >Выход</button>
-                                        </>
-                                    )
-                                    :
-                                    (
-                                        <button
-                                            className='btn btn-success'
-                                            style={{'float':'right'}}
-                                            onClick={clickAuth}
-                                        >Авторизация</button>
-                                    )
-                            }
-                        </div>
-                    </div>
-                    <form>
-                        <div className="mb-3">
-                            <label  className="form-label" >Поиск:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="exampleInputEmail1"
-                                aria-describedby="emailHelp"
-                                onInput={(e => setInputSearch(e.target.value))}
-                            />
-                        </div>
-                    </form>
-
-                    <div className='mb-2'onClick={filterProduct}>
-                        <ul className="list-group"  ref={refUl}>
-                            <li
-                                className="list-group-item active"
-                                data-price = "popular">Популярные
-                            </li>
-                            <li
-                                className="list-group-item"
-                                data-price = "cheap">От дешевых к дорогим
-                            </li>
-                            <li
-                                className="list-group-item"
-                                data-price = "dear">От дорогих к дешевым
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="row" onClick={checkProduct}>
+                <Basket/>
+                <div className="row">
+                    <div className="col-2 offset-10 mt-2 d-flex flex-column">
                         {
-                            filterCountries.map(item=>(
-                                <ProductList
-                                    key = {item.alpha2Code + item.name}
-                                    name = {item.name}
-                                    flag = {item.flags.png}
-                                    price = {item.population}
-                                    keys = {item.area}
-                                />
-                            ))
+                            (user !== null)?(
+                                    <>
+                                        <h4
+                                            className='auth_block'
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal2"
+                                        >{user.displayName}
+                                        </h4>
+
+                                        <img
+                                            src={user.photoURL}
+                                            alt={user.displayName}
+                                            className='auth_block'
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal2"
+                                        />
+                                        <button
+                                            className='btn btn-danger mt-2 auth_block'
+                                            style={{'width': '50%'}}
+                                            onClick={()=> auth.signOut()}
+                                        >Выход</button>
+                                        <ModalAuth/>
+                                    </>
+                                )
+                                :
+                                (
+                                    <button
+                                        className='btn btn-success'
+                                        style={{'float':'right'}}
+                                        onClick={clickAuth}
+                                    >Авторизация</button>
+                                )
                         }
                     </div>
                 </div>
-            </>
-        )
+                <form>
+                    <div className="mb-3">
+                        <label  className="form-label" >Поиск:</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="exampleInputEmail1"
+                            aria-describedby="emailHelp"
+                            onInput={(e => setInputSearch(e.target.value))}
+                        />
+                    </div>
+                </form>
+
+                <div className='mb-2'onClick={filterProduct}>
+                    <ul className="list-group"  ref={refUl}>
+                        <li
+                            className="list-group-item active"
+                            data-price = "popular">Популярные
+                        </li>
+                        <li
+                            className="list-group-item"
+                            data-price = "cheap">От дешевых к дорогим
+                        </li>
+                        <li
+                            className="list-group-item"
+                            data-price = "dear">От дорогих к дешевым
+                        </li>
+                    </ul>
+                </div>
+                <div className="row" onClick={checkProduct}>
+                    {
+                        filterCountries.map(item=>(
+                            <ProductList
+                                key = {item.alpha2Code + item.name}
+                                name = {item.name}
+                                flag = {item.flags.png}
+                                price = {item.population}
+                                keys = {item.area}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+        </>
     )
 }

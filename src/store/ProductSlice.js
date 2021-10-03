@@ -6,7 +6,6 @@ export const ProductSlice = createSlice({
     initialState:{
         count: {},
         product: [],
-        authСondition: true,
         authData : {
             name: false,
             img: false,
@@ -23,6 +22,13 @@ export const ProductSlice = createSlice({
             if (state.count[item] === undefined) state.count[item] = 1;
             else state.count[item]++;
         },
+        resetCount: (state,data) =>{
+            let obj = data.payload;
+
+            for (const item in obj) {
+                state.count[item] = obj[item];
+            }
+        },
         reset: (state,data) =>{
             if (state.product.length < 1) state.product = data.payload;
 
@@ -35,9 +41,8 @@ export const ProductSlice = createSlice({
         },
         productDelete: (state,data) =>{
             let item = data.payload;
-            let question = prompt('Вы уверение что хотите удалить этот товар ?', 'Да')
 
-            if (question !== null) delete state.count[item];
+            delete state.count[item];
         },
 
         authCheck: (state,data) => {
@@ -64,7 +69,7 @@ export const ProductSlice = createSlice({
     }
 })
 
-export const {add, reset,minus, productDelete,authCheck,statusModalCheck,historyAdd}  = ProductSlice.actions;
+export const {add, reset,minus, productDelete,authCheck,statusModalCheck,historyAdd,resetCount}  = ProductSlice.actions;
 export const countSelect = state => state.product.count;
 export const productSelect = state => state.product.product;
 export const authСonditionSelect = state => state.product.authСondition;
