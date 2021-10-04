@@ -19,7 +19,7 @@ import {add,
     resetCount
 } from '../store/ProductSlice'
 import {useAuthState} from "react-firebase-hooks/auth";
-import {useCollectionData} from "react-firebase-hooks/firestore";
+
 
 
 
@@ -29,7 +29,6 @@ export default function Main (){
 
     const {auth,firestore} = useContext(Context);
     const [user] = useAuthState(auth);
-    const [shop] = useCollectionData(firestore.collection('react_shop'))
 
 
     const refUl = React.createRef();
@@ -67,7 +66,7 @@ export default function Main (){
         else dispatch(resetCount(JSON.parse(localStorage.getItem('count'))));
 
 
-    },[count,user])
+    },[count, dispatch, user])
 
 
     // Filter
@@ -98,7 +97,7 @@ export default function Main (){
             if (user !== null){
                 if (dataset.key !== undefined) {
                     dispatch(add(dataset.key))
-                };
+                }
             } else alert('Для покупки нужно авторизивуваться')
 
         }
@@ -111,6 +110,7 @@ export default function Main (){
         const provider =  new firebase.auth.GoogleAuthProvider()
         const {user} =  await auth.signInWithPopup(provider)
 
+        console.log(user)
     }
 
 
@@ -217,7 +217,7 @@ export default function Main (){
                     </div>
                 </form>
 
-                <div className='mb-2'onClick={filterProduct}>
+                <div className='mb-2' onClick={filterProduct}>
                     <ul className="list-group"  ref={refUl}>
                         <li
                             className="list-group-item active"

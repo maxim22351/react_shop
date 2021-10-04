@@ -14,7 +14,6 @@ export default function ModalAuth (){
 
     const product = useSelector(productSelect);
 
-    const [count,setCount] = useState([]);
     const [userHistory,setUserHistory] = useState([]);
     const [loading,setLoading] = useState(true);
 
@@ -28,43 +27,11 @@ export default function ModalAuth (){
     const [shop] = useCollectionData(firestore.collection('react_shop').orderBy('time'))
 
 
-
-
-
     useEffect(()=>{
-        // let arr = []
-        //
-        // props.shop.map(obj=>{
-        //     if (props.user === obj.uid){
-        //         for (const item in obj.count) {
-        //             arr.push(item)
-        //         }
-        //     }
-        // })
-        //
-        // let filterArr = arr.filter(function(item, pos) {
-        //     return arr.indexOf(item) === pos;
-        // })
-        //
-        // setCount(filterArr)
-        //
-        // console.log(count.length)
-        // console.log(productsObj[count[0]]['flag'])
 
         if (shop !== undefined){
-            let arr = [];
             setUserHistory(shop)
             setLoading(false)
-
-            shop.map(item=>{
-                if (item.uid === user.uid){
-                    arr.push(Object.keys(item.count))
-                }
-            })
-
-            setCount(arr)
-
-
         }
     },[shop])
 
@@ -99,8 +66,8 @@ export default function ModalAuth (){
                                     userHistory.map((item,index)=>(
                                         (item.uid === user.uid)?
                                             (
-                                                <tr key={item.uid + item.name + index}>
-                                                    <td style={{'text-align': 'center'}}>
+                                                <tr key={item.uid + index}>
+                                                    <td style={{'textAlign': 'center'}}>
                                                         <div>
                                                             <p>
                                                                 {(item.time.day <= 9)? '0' + item.time.day : item.time.day}.
@@ -119,7 +86,10 @@ export default function ModalAuth (){
                                                     <td>
                                                         {
                                                             Object.keys(item.count).map(itemCount=>(
-                                                                <div style={{'display': 'flex', 'alignItems': 'center'}}>
+                                                                <div
+                                                                    style={{'display': 'flex', 'alignItems': 'center'}}
+
+                                                                >
                                                                     <img
                                                                         src={productsObj[itemCount]['flag']}
                                                                         alt={productsObj[itemCount]['name']}
@@ -128,14 +98,16 @@ export default function ModalAuth (){
                                                                     <p>{productsObj[itemCount]['name']}</p>
                                                                 </div>
                                                             ))
-
                                                         }
                                                     </td>
                                                     <td>
                                                         <div className='modalAuth_table'>
                                                             {
-                                                                Object.keys(item.count).map(itemCount=>(
-                                                                    <p>${productsObj[itemCount]['population']}</p>
+                                                                Object.keys(item.count).map((itemCount,indexCount)=>(
+                                                                    <p
+
+                                                                    >${productsObj[itemCount]['population']}
+                                                                    </p>
                                                                 ))
                                                             }
                                                         </div>
@@ -143,21 +115,27 @@ export default function ModalAuth (){
                                                     <td>
                                                         <div className='modalAuth_table'>
                                                             {
-                                                                Object.keys(item.count).map(itemCount=>(
-                                                                    <p>{item.count[itemCount]}</p>
+                                                                Object.keys(item.count).map((itemCount,indexCount)=>(
+                                                                    <p
+
+                                                                    >{item.count[itemCount]}
+                                                                    </p>
                                                                 ))
 
                                                             }
                                                         </div>
                                                     </td>
                                                     <td>
-                                                       <div className='modalAuth_table'>
-                                                           {
-                                                               Object.keys(item.count).map(itemCount=>(
-                                                                   <p>${productsObj[itemCount]['population'] * item.count[itemCount]}</p>
-                                                               ))
-                                                           }
-                                                       </div>
+                                                        <div className='modalAuth_table'>
+                                                            {
+                                                                Object.keys(item.count).map((itemCount,indexCount)=>(
+                                                                    <p
+
+                                                                    >${productsObj[itemCount]['population'] * item.count[itemCount]}
+                                                                    </p>
+                                                                ))
+                                                            }
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             )

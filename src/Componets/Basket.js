@@ -74,24 +74,24 @@ export default function Basket (){
                                 <tbody>
                                 {
                                     Object.keys(count).map(item=>(
-                                        <tr key = {productsObj[item]['name'] + productsObj[item]['area']}>
-                                            <td>
-                                                <img src={productsObj[item]['flag']} alt={productsObj[item]['name']}/>
-                                                {productsObj[item]['name']}
-                                            </td>
-                                            <td>
-                                                ${productsObj[item]['population']}
-                                            </td>
-                                            <td>
-                                                <b>{count[item]}</b>
-                                                <button className='btn btn-success' onClick = {()=> dispatch(add(productsObj[item]['area']))}>+</button>
-                                                <button className='btn btn-secondary' onClick = {()=> dispatch(minus(productsObj[item]['area']))}>-</button>
-                                                <button className='btn btn-danger' onClick = {()=> dispatch(productDelete(productsObj[item]['area']))}>X</button>
-                                            </td>
-                                            <td>
-                                                ${productsObj[item]['population'] * count[item]}
-                                            </td>
-                                        </tr>
+                                       <tr key = {productsObj[item]['name'] + productsObj[item]['area']}>
+                                           <td>
+                                               <img src={productsObj[item]['flag']} alt={productsObj[item]['name']}/>
+                                               {productsObj[item]['name']}
+                                           </td>
+                                           <td>
+                                               ${productsObj[item]['population']}
+                                           </td>
+                                           <td>
+                                               <b>{count[item]}</b>
+                                               <button className='btn btn-success' onClick = {()=> dispatch(add(productsObj[item]['area']))}>+</button>
+                                               <button className='btn btn-secondary' onClick = {()=> dispatch(minus(productsObj[item]['area']))}>-</button>
+                                               <button className='btn btn-danger' onClick = {()=> dispatch(productDelete(productsObj[item]['area']))}>X</button>
+                                           </td>
+                                           <td>
+                                               ${productsObj[item]['population'] * count[item]}
+                                           </td>
+                                       </tr>
                                     ))
                                 }
                                 <tr>
