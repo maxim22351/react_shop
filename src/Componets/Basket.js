@@ -66,7 +66,7 @@ export default function Basket (){
                                 <thead>
                                 <tr>
                                     <th>Название:</th>
-                                    <th>Стоимость за 1:</th>
+                                    <th>Стоимость за единицу:</th>
                                     <th>Количество:</th>
                                     <th>Стоимость:</th>
                                 </tr>

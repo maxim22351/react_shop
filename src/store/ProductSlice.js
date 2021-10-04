@@ -6,14 +6,6 @@ export const ProductSlice = createSlice({
     initialState:{
         count: {},
         product: [],
-        authData : {
-            name: false,
-            img: false,
-            email: false,
-            uid: false,
-        },
-        statusModal: 'none',
-        history: ''
     },
     reducers:{
         add: (state,data) => {
@@ -25,8 +17,10 @@ export const ProductSlice = createSlice({
         resetCount: (state,data) =>{
             let obj = data.payload;
 
-            for (const item in obj) {
-                state.count[item] = obj[item];
+            if(obj === 'delete'){
+                for (const item in state.count) delete state.count[item];
+            } else {
+                for (const item in obj) state.count[item] = obj[item];
             }
         },
         reset: (state,data) =>{
@@ -45,37 +39,15 @@ export const ProductSlice = createSlice({
             delete state.count[item];
         },
 
-        authCheck: (state,data) => {
-            let item = data.payload;
-
-            state.authСondition = true;
-
-            state.authData.name = item.displayName;
-            state.authData.img = item.photoURL;
-            state.authData.email = item.email;
-            state.authData.uid = item.uid;
-
-        },
-        statusModalCheck: (state,data) => {
-            state.statusModal = data.payload;
-
-        },
-
-        historyAdd: (state,data) => {
-            if (data.payload !== undefined) state.history = data.payload;
-        },
 
 
     }
 })
 
-export const {add, reset,minus, productDelete,authCheck,statusModalCheck,historyAdd,resetCount}  = ProductSlice.actions;
+export const {add, reset,minus, productDelete,resetCount}  = ProductSlice.actions;
 export const countSelect = state => state.product.count;
 export const productSelect = state => state.product.product;
-export const authСonditionSelect = state => state.product.authСondition;
-export const authDataSelect = state => state.product.authData;
-export const statusModalSelect = state => state.product.statusModal;
-export const historySelect = state => state.product.history;
+
 
 
 

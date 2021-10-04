@@ -16,11 +16,6 @@ import ModalAuth from "./ModalAuth";
 import {add,
     reset,
     countSelect,
-    authСonditionSelect,
-    authDataSelect,
-    statusModalSelect,
-    statusModalCheck,
-    historySelect,
     resetCount
 } from '../store/ProductSlice'
 import {useAuthState} from "react-firebase-hooks/auth";
@@ -34,9 +29,8 @@ export default function Main (){
 
     const {auth,firestore} = useContext(Context);
     const [user] = useAuthState(auth);
-    const [shop] = useCollectionData(
-        firestore.collection('react_shop').orderBy('time')
-    )
+    const [shop] = useCollectionData(firestore.collection('react_shop'))
+
 
     const refUl = React.createRef();
 
@@ -46,10 +40,7 @@ export default function Main (){
     const [loading,setLoading] = useState(true)
 
     const count = useSelector(countSelect);
-    const authСondition = useSelector(authСonditionSelect);
-    const authData = useSelector(authDataSelect);
-    const statusModal = useSelector(statusModalSelect);
-    const historyUser = useSelector(historySelect);
+
 
     const dispatch = useDispatch();
 
@@ -64,6 +55,7 @@ export default function Main (){
 
     // Get Product
     useEffect(()=>{
+
         axios.get(urlAllProduct)
             .then(async resp => {
                await setProducts(resp.data)
@@ -72,13 +64,10 @@ export default function Main (){
             })
 
         if (Object.keys(count).length > 0) localStorage.setItem('count',JSON.stringify(count));
-        else {
-             dispatch(resetCount(JSON.parse(localStorage.getItem('count'))))
-        }
+        else dispatch(resetCount(JSON.parse(localStorage.getItem('count'))));
 
 
-    },[count])
-
+    },[count,user])
 
 
     // Filter
@@ -125,15 +114,36 @@ export default function Main (){
     }
 
 
+    // sign firebase
+   async function signOut (){
+       await sendData();
+        auth.signOut();
+        localStorage.removeItem('count')
+        dispatch(resetCount('delete'))
+
+
+    }
+
+
     // Send firebase
     async function sendData (){
-       await firestore.collection('react_shop').add({
-            uid: user.uid,
-            name: user.displayName,
-            count: JSON.parse(localStorage.getItem('count')),
-            email: user.email,
-            time: firebase.firestore.FieldValue.serverTimestamp()
-        })
+        let date = new Date();
+        if(localStorage.getItem('count') !== null){
+            await firestore.collection('react_shop').add({
+                uid: user.uid,
+                name: user.displayName,
+                count: count,
+                email: user.email,
+                time: {
+                  day: date.getDate(),
+                  month: date.getMonth() + 1,
+                  year: date.getFullYear(),
+                  hours: date.getHours(),
+                  minutes: date.getMinutes(),
+                  seconds: date.getSeconds()
+                }
+            })
+        }
     }
 
     //Loading
@@ -141,6 +151,7 @@ export default function Main (){
         setTimeout(()=>{
             setLoading(false)
         },1000)
+
     }
 
     Loadings();
@@ -177,7 +188,7 @@ export default function Main (){
                                         <button
                                             className='btn btn-danger mt-2 auth_block'
                                             style={{'width': '50%'}}
-                                            onClick={()=> auth.signOut()}
+                                            onClick={signOut}
                                         >Выход</button>
                                         <ModalAuth/>
                                     </>
