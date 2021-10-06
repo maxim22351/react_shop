@@ -85,11 +85,12 @@ export default function ModalAuth (){
                                                     </td>
                                                     <td>
                                                         {
-                                                            Object.keys(item.count).map(itemCount=>(
+                                                            Object.keys(item.count).map((itemCount,indexCount)=>(
                                                                 <div
                                                                     style={{'display': 'flex', 'alignItems': 'center'}}
-
+                                                                    key={index * indexCount + productsObj[itemCount]['name']}
                                                                 >
+
                                                                     <img
                                                                         src={productsObj[itemCount]['flag']}
                                                                         alt={productsObj[itemCount]['name']}
@@ -105,7 +106,7 @@ export default function ModalAuth (){
                                                             {
                                                                 Object.keys(item.count).map((itemCount,indexCount)=>(
                                                                     <p
-
+                                                                        key={indexCount * index + productsObj[itemCount]['name']}
                                                                     >${productsObj[itemCount]['population']}
                                                                     </p>
                                                                 ))
@@ -117,7 +118,7 @@ export default function ModalAuth (){
                                                             {
                                                                 Object.keys(item.count).map((itemCount,indexCount)=>(
                                                                     <p
-
+                                                                        key={indexCount * index + productsObj[itemCount]['name']}
                                                                     >{item.count[itemCount]}
                                                                     </p>
                                                                 ))
@@ -130,7 +131,7 @@ export default function ModalAuth (){
                                                             {
                                                                 Object.keys(item.count).map((itemCount,indexCount)=>(
                                                                     <p
-
+                                                                        key={indexCount * index + productsObj[itemCount]['name']}
                                                                     >${productsObj[itemCount]['population'] * item.count[itemCount]}
                                                                     </p>
                                                                 ))

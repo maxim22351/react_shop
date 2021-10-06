@@ -62,11 +62,26 @@ export default function Main (){
                await dispatch(reset(resp.data))
             })
 
-        if (Object.keys(count).length > 0) localStorage.setItem('count',JSON.stringify(count));
-        else dispatch(resetCount(JSON.parse(localStorage.getItem('count'))));
+
+        if (Object.keys(count).length > 0){
+            localStorage.setItem('count',JSON.stringify(count))
+        }
 
 
     },[count, dispatch, user])
+
+    useEffect(()=>{
+        if (localStorage.getItem('count') !== null){
+            let countLocal = JSON.parse(localStorage.getItem('count'));
+
+            if (countLocal[Object.keys(countLocal)[0]]  > 0
+                && Object.keys(countLocal).length === 1){
+                localStorage.removeItem('count')
+            }
+        }
+
+        dispatch(resetCount(JSON.parse(localStorage.getItem('count'))));
+    },[])
 
 
     // Filter

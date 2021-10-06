@@ -38,7 +38,7 @@ export default function Basket (){
 
         // eslint-disable-next-line array-callback-return
         Object.keys(count).map(item=>{
-            a.push(productsObj[item]['population'] * count[item])
+            if (productsObj[item] !== undefined) a.push(productsObj[item]['population'] * count[item]);
         })
 
         let b = a.reduce((prev,item)=>{
@@ -74,24 +74,31 @@ export default function Basket (){
                                 <tbody>
                                 {
                                     Object.keys(count).map(item=>(
-                                       <tr key = {productsObj[item]['name'] + productsObj[item]['area']}>
-                                           <td>
-                                               <img src={productsObj[item]['flag']} alt={productsObj[item]['name']}/>
-                                               {productsObj[item]['name']}
-                                           </td>
-                                           <td>
-                                               ${productsObj[item]['population']}
-                                           </td>
-                                           <td>
-                                               <b>{count[item]}</b>
-                                               <button className='btn btn-success' onClick = {()=> dispatch(add(productsObj[item]['area']))}>+</button>
-                                               <button className='btn btn-secondary' onClick = {()=> dispatch(minus(productsObj[item]['area']))}>-</button>
-                                               <button className='btn btn-danger' onClick = {()=> dispatch(productDelete(productsObj[item]['area']))}>X</button>
-                                           </td>
-                                           <td>
-                                               ${productsObj[item]['population'] * count[item]}
-                                           </td>
-                                       </tr>
+                                        (productsObj[item] !== undefined)?
+                                            (
+                                                <tr key = {productsObj[item]['name'] + productsObj[item]['area']}>
+                                                    <td>
+                                                        <img src={productsObj[item]['flag']} alt={productsObj[item]['name']}/>
+                                                        {productsObj[item]['name']}
+                                                    </td>
+                                                    <td>
+                                                        ${productsObj[item]['population']}
+                                                    </td>
+                                                    <td>
+                                                        <b>{count[item]}</b>
+                                                        <button className='btn btn-success' onClick = {()=> dispatch(add(productsObj[item]['area']))}>+</button>
+                                                        <button className='btn btn-secondary' onClick = {()=> dispatch(minus(productsObj[item]['area']))}>-</button>
+                                                        <button className='btn btn-danger' onClick = {()=> dispatch(productDelete(productsObj[item]['area']))}>X</button>
+                                                    </td>
+                                                    <td>
+                                                        ${productsObj[item]['population'] * count[item]}
+                                                    </td>
+                                                </tr>
+                                            )
+                                            :
+                                            (
+                                                <h1>Ошибка загрузки</h1>
+                                            )
                                     ))
                                 }
                                 <tr>
