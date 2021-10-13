@@ -26,6 +26,10 @@ img{
     text-align: center;
 }
 
+.test{
+    background-color: red;
+}
+
 .modal{
     left: -12%;
 }
